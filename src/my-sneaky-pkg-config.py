@@ -105,10 +105,12 @@ def fetch_lib( lib ):
         raise Exception("Unknown lib: " + lib + " in source map, cannot auto-fetch!")
         
     fetch_com,make_com = _known_library_source_map[lib]
-    print "   .. fetching: " + fetch_com
+    if DEBUG:
+        print "   .. fetching: " + fetch_com
     #subprocess.check_call( fetch_com, shell=True )
     os.system( fetch_com )
-    print "   .. making  : " + make_com
+    if DEBUG:
+        print "   .. making  : " + make_com
     #subprocess.check_call( make_com, shell=True )
     os.system( make_com )
     
