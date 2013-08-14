@@ -30,3 +30,5 @@ lcmtypes_p2l-point-process-experiment-core @@ cd $BUILD_PREFIX && git clone ~/pr
 lcmtypes_p2l-probability-core		   @@ cd $BUILD_PREFIX && git clone ~/projects/gits/pods/p2l-probability-core/ 			@@ cd $BUILD_PREFIX/p2l-probability-core && make
 lcmtypes_p2l-ruler-point-process	   @@ cd $BUILD_PREFIX && git clone ~/projects/gits/pods/p2l-ruler-point-process/ 		@@ cd $BUILD_PREFIX/p2l-ruler-point-process && make
 unittest++ 				   @@ cd $BUILD_PREFIX && git clone ~/projects/gits/pods/unittest-cpp-latest/ 			@@ cd $BUILD_PREFIX/unittest-cpp-latest && make
+libbot2					   @@ cd $BUILD_PREFIX && svn checkout http://libbot.googlecode.com/svn/trunk libbot2		@@ cd $BUILD_PREFIX/libbot2 && make
+bot2-lcmgl-client			   @@ cd $BUILD_PREFIX && svn checkout http://libbot.googlecode.com/svn/trunk libbot2		@@ cd $BUILD_PREFIX/libbot2 && make
