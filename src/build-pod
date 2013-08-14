@@ -10,6 +10,6 @@ fi
 
 
 # ok, expand path to have the build directory in it and call make
-PATH=$(BUILD_PREFIX)/bin/:$PATH make
+PATH=$BUILD_PREFIX/bin/:$PATH make
 
 
