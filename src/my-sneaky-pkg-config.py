@@ -4,6 +4,7 @@
 from functools import reduce
 import sys
 import os
+import os.path
 import subprocess
 
 
@@ -98,28 +99,40 @@ def try_to_find_pc_filename( lib ):
     return None
 
 
+def find_build_prefix(upchain=4):
+    path = os.path.join( os.getcwd() )
+    for i in xrange(upchain):
+        if os.path.isdir( os.path.join( path, "build/" ) ):
+            return os.path.join( path, "build/" )
+        path = os.path.join( path, ".." )
+    return os.path.join( os.getcwd(), "build/" )
+
+
 def fetch_lib( lib ):
     
     # try to find and fetch this library
     if lib not in _known_library_source_map:
         raise Exception("Unknown lib: " + lib + " in source map, cannot auto-fetch!")
+
+    # get the build_prefix directory
+    build_prefix = find_build_prefix()
         
     fetch_com,make_com = _known_library_source_map[lib]
     if DEBUG:
         print "   .. fetching: " + fetch_com
     #subprocess.check_call( fetch_com, shell=True )
-    os.system( fetch_com )
+    os.system( "if [ -n \"${INSIDE_SNEAKY_PKGCONFIG+x}\" ]; then dummy_1=1 ; else BUILD_PREFIX=\"" + build_prefix + "\" ; INSIDE_SNEAKY_PKGCONFIG=1 ; fi ; " + fetch_com )
     if DEBUG:
         print "   .. making  : " + make_com
     #subprocess.check_call( make_com, shell=True )
-    os.system( make_com )
+    os.system( "if [ -n \"${INSIDE_SNEAKY_PKGCONFIG+x}\" ]; then dummy_1=1 ; else BUILD_PREFIX=\"" + build_prefix + "\" ; INSIDE_SNEAKY_PKGCONFIG=1 ; fi ; " + make_com )
     
     # if not lib_exists( lib ):
     #     raise Exception( "Fetch of " + lib + " FAILED: using mapping: " + str( (fetch_com,make_com) ) )
 
 
 def lib_exists( lib ):
-    res = subprocess.call( ["pkg-config", "--exists", lib ] )
+    res = subprocess.call( ["/usr/bin/orig-pkg-config", "--exists", lib ] )
     return (res == 0 )
 
 
@@ -131,7 +144,7 @@ def get_direct_dependencies( lib ):
     req = []
 
     try:
-        output = subprocess.check_output( ["pkg-config", "--print-requires", lib ] )
+        output = subprocess.check_output( ["/usr/bin/orig-pkg-config", "--print-requires", lib ] )
         #output_priv = subprocess.check_output( ["pkg-config", "--print-requires-private", lib ] )
     
         # parse output
@@ -201,7 +214,7 @@ if __name__ == "__main__":
 
 
     # load the know source mappings
-    _load_library_source_map( set(["library-source-map.txt"]) )
+    _load_library_source_map( set(["/home/velezj/projects/gits/pods/velezj-pods-utils/src/library-source-map.txt"]) )
     
     # grab arguments which are *not* flags (pkg-config is nice in that
     # there are no non-flag value arguments: thigns either have -- in front
@@ -224,11 +237,16 @@ if __name__ == "__main__":
                     wanted_orderings.append( line_s )
             wanted_orderings = set( wanted_orderings )
             sys.argv.remove(arg)
+            libs += [ x for x in (wanted_orderings - set(libs)) ]
+        if arg == "--print-fetchables":
+            for lib in _known_library_source_map.iterkeys():
+                print lib
+            sys.argv.remove(arg)
         if arg == "--print-requires" or arg == "--print-requires-private":
             
             # we are done, pass through and exit
             #print "passing throught!"
-            res = subprocess.call( ["pkg-config"] + sys.argv[1:] )
+            res = subprocess.call( ["/usr/bin/orig-pkg-config"] + sys.argv[1:] )
             exit(res)
 
     # Ok, check if we have those libraries (using pkg-config itself)
@@ -251,14 +269,15 @@ if __name__ == "__main__":
         ordering = []
         for level in tps:
             if not wanted_orderings.isdisjoint( level ):
-                ordering += [ x for x in ( wanted_orderings & level ) ]
+                #ordering += [ x for x in ( wanted_orderings & level ) ]
+                ordering += [ x for x in level ]
         for o in ordering:
             print o
     
     
     # pass through and return
     #print "passing throught!"
-    res = subprocess.call( ["pkg-config"] + sys.argv[1:] )
+    res = subprocess.call( ["/usr/bin/orig-pkg-config"] + sys.argv[1:] )
     exit(res)
     
 

@@ -1,0 +1,15 @@
+#!/usr/bin/bash
+
+
+BUILD_PREFIX=LOCATION
+
+# make sure to clean any previous pod-build directory
+if [ -d pod-build ]; then
+    rm -rf pod-build;
+fi
+
+
+# ok, expand path to have the build directory in it and call make
+PATH=$(BUILD_PREFIX)/bin/:$PATH make
+
+
