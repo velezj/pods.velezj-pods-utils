@@ -32,25 +32,12 @@ function _pod_run_completion_()
     
 	# generate the completion forms
 	#IFS="\0"
-	COMPREPLY=($(compgen -W "${possible_commands}" ${word}));
+	COMPREPLY=($(compgen -W "${possible_commands}" -- ${word}));
+	return 0;
     else
 	
 	# Ok, we already have an executable, so return its completion
-	executable=${words_of_line[1]};
-	if [ "${executable}" = "" ]; then
-	    executable="-D";
-	fi
-	complete_line=$(complete -p ${executable});
-	comp_pat=${complete_line#* };
-	comp_pat=${comp_pat%${executable}};
-	COMPREPLY=($(compgen ${comp_pat} ${word}));
-	#COMPREPLY=(e f g h);
-	#COMPREPLY=($(compgen -W 'a b c d'));
-	compgen_cmd="compgen ${comp_pat} ${word}";
-	compgen_output=$(compgen ${comp_pat} ${word});
-	#echo "exec: ${executable} complete: ${complete_line} comp_pat: ${comp_pat}";
-	#echo "cmd: ${compgen_cmd}";
-	#echo "gen: ${compgen_output}  reply: ${COMPREPLY[@]}";
+	_command_offset 1;
     fi
 }
 
