@@ -1,0 +1,32 @@
+#!/bin/bash
+
+function _pod_run_completion_()
+{
+
+    local cmd="${1##*/}"
+    local word=${COMP_WORDS[COMP_CWORD]}
+    local line=${COMP_LINE}
+
+    # locate the build prefix
+    if [ "$BUILD_PREFIX" = "" ]; then
+	for pfx in ./ .. ../.. ../../.. ../../../..; do d=`pwd`/$pfx/build;
+            if [ -d $d ]; then 
+		BUILD_PREFIX=$d; 
+		break; 
+	    fi; 
+	done;
+	if [ "$BUILD_PREFIX" = "" ]; then
+	    #BUILD_PREFIX=`pwd`/build;
+	    BUILD_PREFIX=""
+	fi
+    fi
+
+    # find all the files in the bin directory which are executable
+    possible_commands=`find ${BUILD_PREFIX}/bin/ -maxdepth 1 -executable -printf "%f\n"`
+    
+    # generate the completion forms
+    #IFS="\0"
+    COMPREPLY=($(compgen -W "${possible_commands}" ${word}))
+}
+
+complete -F _pod_run_completion_ pod-run
