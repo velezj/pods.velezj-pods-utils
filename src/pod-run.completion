@@ -6,6 +6,9 @@ function _pod_run_completion_()
     local cmd="${1##*/}"
     local word=${COMP_WORDS[COMP_CWORD]}
     local line=${COMP_LINE}
+    local words_of_line=( $line )
+
+    #echo "words: ${#COMP_WORDS[@]} word: ${word} kwords: ${COMP_WORDS[@]} words_of_line: ${words_of_line[@]} line: $line"
 
     # locate the build prefix
     if [ "$BUILD_PREFIX" = "" ]; then
@@ -21,12 +24,34 @@ function _pod_run_completion_()
 	fi
     fi
 
-    # find all the files in the bin directory which are executable
-    possible_commands=`find ${BUILD_PREFIX}/bin/ -maxdepth 1 -executable -printf "%f\n"`
+    # check if we do not have an executabl yet
+    if [[ ${#COMP_WORDS[@]} < 3 ]]; then
+
+	# find all the files in the bin directory which are executable
+	possible_commands=$(find ${BUILD_PREFIX}/bin/ -maxdepth 1 -executable -printf "%f\n");
     
-    # generate the completion forms
-    #IFS="\0"
-    COMPREPLY=($(compgen -W "${possible_commands}" ${word}))
+	# generate the completion forms
+	#IFS="\0"
+	COMPREPLY=($(compgen -W "${possible_commands}" ${word}));
+    else
+	
+	# Ok, we already have an executable, so return its completion
+	executable=${words_of_line[1]};
+	if [ "${executable}" = "" ]; then
+	    executable="-D";
+	fi
+	complete_line=$(complete -p ${executable});
+	comp_pat=${complete_line#* };
+	comp_pat=${comp_pat%${executable}};
+	COMPREPLY=($(compgen ${comp_pat} ${word}));
+	#COMPREPLY=(e f g h);
+	#COMPREPLY=($(compgen -W 'a b c d'));
+	compgen_cmd="compgen ${comp_pat} ${word}";
+	compgen_output=$(compgen ${comp_pat} ${word});
+	#echo "exec: ${executable} complete: ${complete_line} comp_pat: ${comp_pat}";
+	#echo "cmd: ${compgen_cmd}";
+	#echo "gen: ${compgen_output}  reply: ${COMPREPLY[@]}";
+    fi
 }
 
 complete -F _pod_run_completion_ pod-run
