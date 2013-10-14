@@ -4,3 +4,8 @@ cmake_minimum_required(VERSION 2.6.0)
 set(POD_NAME pods-utils)
 include(cmake/pods.cmake)
 
+
+# install the pod-run shell script
+install( PROGRAMS src/pod-run
+    DESTINATION
+    bin )

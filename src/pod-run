@@ -1,0 +1,37 @@
+
+##
+# Fist, find the build directory for PODS from the current directory
+# Figure out where we build the software.
+#   Use BUILD_PREFIX if it was passed in.
+#   If not, search up to four parent directories for a 'build' directory.
+#   Otherwise, use ./build.
+if [ "$BUILD_PREFIX" = "" ]; then
+    for pfx in ./ .. ../.. ../../.. ../../../..; do d=`pwd`/$pfx/build;
+        if [ -d $d ]; then 
+	    BUILD_PREFIX=$d; 
+	    break; 
+	fi; 
+    done;
+    if [ "$BUILD_PREFIX" = "" ]; then
+	#BUILD_PREFIX=`pwd`/build;
+	BUILD_PREFIX=""
+    fi
+fi
+echo "BUILD_PREFIX = $BUILD_PREFIX"
+
+
+##
+# Ok, now that we have the BUILD_PREFIX, setup the PATH and
+# environment to look at hte build prefix first
+PATH=$BUILD_PREFIX/bin:$PATH
+PKG_CONFIG_PATH=$BUILD_PREFIX/lib/pkgconfig:$PKG_CONFIG_PATH
+
+##
+# Run the command line
+#echo "$BUILD_PREFIX/$*"
+#$BUILD_PREFIX/$*
+$*
+
+
+
+
