@@ -27,10 +27,21 @@ PATH=$BUILD_PREFIX/bin:$PATH
 PKG_CONFIG_PATH=$BUILD_PREFIX/lib/pkgconfig:$PKG_CONFIG_PATH
 
 ##
-# Run the command line
-#echo "$BUILD_PREFIX/$*"
-#$BUILD_PREFIX/$*
-$*
+# check if the command exists in the build prefix/bin, and if so then
+# append the build prefix/bin to it (this is so that completion works well)
+cmd=$1
+if [ -e ${BUILD_PREFIX}/bin/$1 ]; then
+    cmd=${BUILD_PREFIX}/bin/$1;
+fi
+
+
+##
+# Run the command
+if [ -e ${BUILD_PREFIX}/bin/$1 ]; then
+    ${BUILD_PREFIX/bin/}$*;
+else
+    $*
+fi
 
 
 
