@@ -38,7 +38,7 @@ fi
 ##
 # Run the command
 if [ -e ${BUILD_PREFIX}/bin/$1 ]; then
-    ${BUILD_PREFIX/bin/}$*;
+    ${BUILD_PREFIX}/bin/$*;
 else
     $*
 fi
