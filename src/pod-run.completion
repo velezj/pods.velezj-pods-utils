@@ -3,6 +3,7 @@
 function _pod_run_completion_()
 {
 
+
     local cmd="${1##*/}"
     local word=${COMP_WORDS[COMP_CWORD]}
     local line=${COMP_LINE}
@@ -41,4 +42,4 @@ function _pod_run_completion_()
     fi
 }
 
-complete -F _pod_run_completion_ pod-run
+complete -F _pod_run_completion_ @EXECUTABLE_INSTALL_PATH@/pod-run

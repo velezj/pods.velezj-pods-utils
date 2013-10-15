@@ -38,6 +38,13 @@ function( pods_add_bash_completion target_name completion_script_input_filename 
 
   # do file configuration if we have a file
   if( ARGC LESS 3 )
+
+    # chekc that the comp[letion script actually at least
+    # *uses* the @EXECUTABLE_INSTALL_PATH@ variable
+    file(STRINGS ${completion_script_input_filename} found_string REGEX ".*\@EXECUTABLE_INSTALL_PATH\@.*")
+    if( found_string STREQUAL "" )
+      message(FATAL_ERROR "completion script did NOT include \@EXECUTABLE_INSTALL_PATH\@ inside of it! (script: ${completion_script_input_filename})")
+    endif()
     
     # Ok, now simply configure the completion script
     configure_file( 
