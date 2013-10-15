@@ -25,21 +25,89 @@ function _pod_run_completion_()
 	fi
     fi
 
+    # get a variable for the dir prefix
+    dir_prefix=${BUILD_PREFIX}/bin/
+    dir_prefix=$(readlink -f ${dir_prefix})
+    dir_prefix="${dir_prefix}/"
+
     # check if we do not have an executabl yet
     if [[ ${#COMP_WORDS[@]} < 3 ]]; then
 
 	# find all the files in the bin directory which are executable
-	possible_commands=$(find ${BUILD_PREFIX}/bin/ -maxdepth 1 -executable -printf "%f\n");
+	possible_commands=$(find ${dir_prefix} -maxdepth 1 -executable -printf "%f\n");
     
 	# generate the completion forms
 	#IFS="\0"
 	COMPREPLY=($(compgen -W "${possible_commands}" -- ${word}));
 	return 0;
     else
-	
-	# Ok, we already have an executable, so return its completion
-	_command_offset 1;
+
+	# Check if we have a compspec for our particular binary
+	executable=${COMP_WORDS[1]}
+	if complete -p ${dir_prefix}${executable} &> /dev/null; then
+	    
+	    # Ok, there is already a spec, so do nothing
+	    local dummy="";
+	    #echo "Found ABSOLUTE compsepc, doing nothing";
+
+	else
+
+	    # hmm, no individual absolute path compspec, see if we
+	    # have one under BUILD_PREFIX/bash-completion
+	    #echo "Trying to retrieve ABSOLUTE compspec from ${BUILD_PREFIX}/bash-completion/${executable}.completion";
+	    if [ -e ${BUILD_PREFIX}/bash-completion/${executable}.completion ]; then
+		# souce the bash completion to try to hook it up
+		source ${BUILD_PREFIX}/bash-completion/${executable}.completion;
+		#echo "SOURCED ${BUILD_PREFIX}/bash-completion/${executable}.completion";
+	    fi
+	fi
+
+
+	# ok, let's check if we have a dir-specific completion
+	if complete -p ${dir_prefix}${executable} &> /dev/null; then
+	    
+	    # we need to *manually* execute this completion
+	    
+	    # get the completion specification (compspec)
+	    compspec=$(complete -p ${dir_prefix}${executable})
+	    compspec=${compspec#complete}
+	    compspec=${compspec%${dir_prefix}${executable}}
+
+	    #echo "MANUAL compspec: ${compspec}"
+	    
+	    # ok, now evaluate compgen with this
+	    COMPREPLY=( $(eval compgen "${compspec}" -- "${word}") )
+	    return 0
+
+	else
+
+	    # # let's be tricky here and add the entri build prefix to the
+	    # # executable we are trying to complete on
+	    # COMP_WORDS[1]=${dir_prefix}${executable}
+	    # offset=${#dir_prefix}
+	    # word_offset=$(awk -v a="${COMP_LINE}" -v b="${executable}" "BEGIN{print index(a,b)}")
+	    # word_offset=$(( word_offset - 1 ))
+	    # echo "word_offset: ${word_offset} offset: ${offset}  orig COMP_POINT: ${COMP_POINT}"
+	    # echo "orig COMP_LINE: ${COMP_LINE}"
+	    # echo "orig comp remaining: ${COMP_LINE:${COMP_POINT}}"
+	    # COMP_POINT=$(( COMP_POINT + $offset ))
+	    # COMP_LINE="${COMP_LINE:0:$word_offset}${dir_prefix}${COMP_LINE:$word_offset}"
+	    # echo "new COMP_POINT: ${COMP_POINT}"
+	    # echo "new COMP_LINE: ${COMP_LINE}"
+	    # echo "comp remaining: ${COMP_LINE:${COMP_POINT}}"
+	    
+	    # Ok, we already have an executable, so return its completion
+	    _command_offset 1;
+	    return 0;
+	fi
     fi
 }
 
 complete -F _pod_run_completion_ @EXECUTABLE_INSTALL_PATH@/pod-run
+# pod-run wants to install a default global pod-run completion if none found
+if complete -p pod-run &> /dev/null; then
+    # do nothing
+    local dummy="";
+else
+    complete -F _pod_run_completion_ pod-run
+fi

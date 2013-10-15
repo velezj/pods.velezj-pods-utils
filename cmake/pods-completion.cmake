@@ -33,6 +33,10 @@ function( pods_add_bash_completion target_name completion_script_input_filename 
   file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/bash-completion/)
   #message(STATUS "ensured directory: ${CMAKE_BINARY_DIR}/bash-completion/")
 
+  # make sure the paths are abosulute
+  get_filename_component( CMAKE_BINARY_DIR ${CMAKE_BINARY_DIR} ABSOLUTE )
+  get_filename_component( CMAKE_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX} ABSOLUTE )
+
   string(CONFIGURE "${CMAKE_BINARY_DIR}/bash-completion/${target_name}.completion" completion_script_output_filename )
   string(CONFIGURE "${CMAKE_INSTALL_PREFIX}/bash-completion/" completion_script_install_dir )
 
