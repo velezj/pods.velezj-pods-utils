@@ -1,5 +1,3 @@
-This is a default README file, please replace its contents with information
-relevant to your project.
 
 This software is constructed according to the Pods software policies and
 templates.  The policies and templates can be found at:
@@ -8,13 +6,105 @@ templates.  The policies and templates can be found at:
 
 ====
 
-Name:         pods-utils
-Maintainers:  FILL-ME-IN
-Summary:      FILL-ME-IN
+Name:         velezj-pods-utils
+Maintainers:  Javier Velez
+Summary:      several useful scripts for PODS
 Description:
-  FILL-ME-IN
+
+	The utilities inside this PODS extend the PODS semantics to
+	include optional bash-completion setup scripts.
+
+	The main utility is pod-run, which allows for PODS-sensitive
+	running of executable(s) and which utilizes the extended 
+	PODS bash-completion semantics to allow for bash completion
+	of possible binaries in a PODS system as well as completion
+	of their PODS specific local arguments.
+
+	We include a CMake file for ease of installing and writing
+	such completion scripts if the PODS is built using CMake.
+	
 
 Requirements: 
-  FILL-ME-IN
+  PODS
+  bash (for bash completion, doh!)
 
-License:      FILL-ME-IN
+License:      Creative Commons CC BY
+
+
+====
+
+
+
+    --------------------------------------------------------------
+    Extended PODS bash-completion semantics
+    
+    This system extends the PODS framework to allow for seamless
+    bash-completion scripts for binaries.
+    
+    For a given script <foo>, the bash completion script to source
+    (a standard bash script) to setup the bash completion system
+    must be installed under BUILD_PREFIX/bash-completion/<foo>.completion.
+    
+    The BUILD_PREFIX is the same as the PODS BUILD_PREFIX.
+    
+    The bash script *must* run a bash "complete" command which
+    targets the ABSOLUTE PATH of the script (the FULL PATH).
+    This is in order to have bash completion correctly work when several
+    local PODS build directories are on a development machine with
+    similarly named scripts that have different completion options.
+    
+    The pods-completion.cmake file described bellow allows one to
+    write the <foo>.completion template using a @EXECUTABLE_INSTALL_PATH@
+    variable which will be correctly expanded upon installation of
+    the completion script to the correct location.  This of course 
+    requires the use of CMake as the build tool for the PODS.
+    
+    CMake is *not* required, the extension to the PODS system simply
+    dictate the following:
+    
+    1) bash completion setup script must be installed in 
+       BUILD_PREFIX/bash-completion/<script-name>.completion
+       
+    2) the completion script must setup the completion for the 
+       FULL ABSOLUTE PATH to the script.
+       hence "complete -f /home/user/projects/build/bin/script_foo"
+       rather than "complete -f script_foo"
+
+    --------------------------------------------------------------
+
+
+    --------------------------------------------------------------
+    pod-run
+    
+    Allows you to easily run an executable from a PODS compatible
+    system.  The pod-run script will search for the binary PODS
+    directory connected with the location called (the current 
+    working directory) and will set up PATH and PKG_CONFIG_PATH
+    environmental variables to have the PODS binary directory in them.
+    The script then calls the command line arguments as a normal
+    bash command.
+
+    If the BUILD_PREFIX/bash-completion/pod-run.completion script
+    if sourced, the pod-run script will tab-complete to the available
+    executable(s) for the current PODS system.
+    
+    The script and pod-run.completion hook into the pods-completion.cmake
+    and the extended PODS bash-completion semantics.  In particular
+    the completion will try to locate completion scripts at the
+    know PODS location and will call these completion scripts
+    during it's own bash completion
+    --------------------------------------------------------------
+
+
+    --------------------------------------------------------------
+    cmake/pods-completion.cmake
+    
+    This is a cmake file which adds the pods_add_bash_completion()
+    function to CMake.  This allows you to add and install a 
+    completion script in style with the extended PODS bash-completion
+    system.  The finale completion scripts are installed under
+    BUILD_PREFIX/bash-completion/<target>.completion
+    --------------------------------------------------------------
+
+ 
+
