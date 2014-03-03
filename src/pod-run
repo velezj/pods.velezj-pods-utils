@@ -17,14 +17,27 @@ if [ "$BUILD_PREFIX" = "" ]; then
 	BUILD_PREFIX=""
     fi
 fi
+BUILD_PREFIX=$(readlink -f $BUILD_PREFIX)
 echo "BUILD_PREFIX = $BUILD_PREFIX"
 
 
 ##
 # Ok, now that we have the BUILD_PREFIX, setup the PATH and
 # environment to look at hte build prefix first
-PATH=$BUILD_PREFIX/bin:$PATH
-PKG_CONFIG_PATH=$BUILD_PREFIX/lib/pkgconfig:$PKG_CONFIG_PATH
+export PATH=$BUILD_PREFIX/bin:$PATH
+export PKG_CONFIG_PATH=$BUILD_PREFIX/lib/pkgconfig:$PKG_CONFIG_PATH
+export CFLAGS="-I$BUILD_PREFIX/include $CFLAGS"
+export CPPFLAGS="-I$BUILD_PREFIX/include $CPPFLAGS"
+export CXXFLAGS="-I$BUILD_PREFIX/include $CXXFLAGS"
+export LDFLAGS="-L$BUILD_PREFIX/lib/ $LDFLAGS"
+export LD_LIBARRY_PATH=$BUILD_PREFIX/lib/:$LD_LIBARRY_PATH
+# echo "CFLAGS:    $CFLAGS"
+# echo "CPPFLAGS:  $CPPFLAGS"
+# echo "CXXFLAGS:  $CXXFLAGS"
+# echo "LDFLAGS:   $LDFLAGS"
+# echo "exporting..."
+
+
 
 ##
 # check if the command exists in the build prefix/bin, and if so then

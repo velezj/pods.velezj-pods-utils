@@ -34,9 +34,9 @@ all: pod-build/Makefile
 	sed s@LOCATION@$(BUILD_PREFIX)@ src/build-pod > $(BUILD_PREFIX)/bin/build-pod
 	chmod a+x $(BUILD_PREFIX)/bin/build-pod
 
-	-if [ -e $(BUILD_PREFIX)/bin/pkg-config ]; then rm $(BUILD_PREFIX)/bin/pkg-config; fi
-	ln -s `pwd`/src/my-sneaky-pkg-config.py $(BUILD_PREFIX)/bin/pkg-config
-	chmod a+x $(BUILD_PREFIX)/bin/pkg-config
+	# -if [ -e $(BUILD_PREFIX)/bin/pkg-config ]; then rm $(BUILD_PREFIX)/bin/pkg-config; fi
+	# ln -s `pwd`/src/my-sneaky-pkg-config.py $(BUILD_PREFIX)/bin/pkg-config
+	# chmod a+x $(BUILD_PREFIX)/bin/pkg-config
 
 	mkdir -p pod-build/
 	echo $(BUILD_PREFIX)/bin/create-configure-pod.sh >> pod-build/install_manifest.txt
