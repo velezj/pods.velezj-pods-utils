@@ -37,7 +37,7 @@ export PYTHONPATH=$BUILD_PREFIX/lib/python2.7/site-packages:$PYTHONPATH
 # Ok, add enviroment variables so that script know they are being called with
 # pod-run
 export POD_RUN_SCOPE=1
-export POD_RUN_COMMAND_LINE=$*
+export POD_RUN_COMMAND_LINE="$*"
 
 
 ##
