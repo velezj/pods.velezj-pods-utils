@@ -31,12 +31,13 @@ export CPPFLAGS="-I$BUILD_PREFIX/include $CPPFLAGS"
 export CXXFLAGS="-I$BUILD_PREFIX/include $CXXFLAGS"
 export LDFLAGS="-L$BUILD_PREFIX/lib/ $LDFLAGS"
 export LD_LIBARRY_PATH=$BUILD_PREFIX/lib/:$LD_LIBARRY_PATH
-# echo "CFLAGS:    $CFLAGS"
-# echo "CPPFLAGS:  $CPPFLAGS"
-# echo "CXXFLAGS:  $CXXFLAGS"
-# echo "LDFLAGS:   $LDFLAGS"
-# echo "exporting..."
+export PYTHONPATH=$BUILD_PREFIX/lib/python2.7/site-packages:$PYTHONPATH
 
+##
+# Ok, add enviroment variables so that script know they are being called with
+# pod-run
+export POD_RUN_SCOPE=1
+export POD_RUN_COMMAND_LINE=$*
 
 
 ##
