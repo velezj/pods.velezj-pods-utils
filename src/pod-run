@@ -18,7 +18,8 @@ if [ "$BUILD_PREFIX" = "" ]; then
     fi
 fi
 BUILD_PREFIX=$(readlink -f $BUILD_PREFIX)
-echo "BUILD_PREFIX = $BUILD_PREFIX"
+
+
 
 
 ##
@@ -33,29 +34,30 @@ export LDFLAGS="-L$BUILD_PREFIX/lib/ $LDFLAGS"
 export LD_LIBARRY_PATH=$BUILD_PREFIX/lib/:$LD_LIBARRY_PATH
 export PYTHONPATH=$BUILD_PREFIX/lib/python2.7/site-packages:$PYTHONPATH
 
+
+##
+# If we  are *not* within pod-run , call pod-run again so that we
+# pick up the correct local pod-run script
+if [ -z "$POD_RUN_SCOPE" ]; then
+    export POD_RUN_SCOPE=1
+    #echo "Attempting to pick local pod-run: $(which pod-run)"
+    pod-run $*
+    exit $?
+fi
+
 ##
 # Ok, add enviroment variables so that script know they are being called with
 # pod-run
 export POD_RUN_SCOPE=1
 export POD_RUN_COMMAND_LINE="$*"
 
+##
+# Dispolay the local PODS builkd_preffix used
+echo "BUILD_PREFIX = $BUILD_PREFIX"
 
 ##
-# check if the command exists in the build prefix/bin, and if so then
-# append the build prefix/bin to it (this is so that completion works well)
-cmd=$1
-if [ -e ${BUILD_PREFIX}/bin/$1 ]; then
-    cmd=${BUILD_PREFIX}/bin/$1;
-fi
-
-
-##
-# Run the command
-if [ -e ${BUILD_PREFIX}/bin/$1 ]; then
-    ${BUILD_PREFIX}/bin/$*;
-else
-    $*
-fi
+# Run the command 
+$*
 
 
 
