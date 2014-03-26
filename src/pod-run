@@ -53,7 +53,7 @@ export POD_RUN_COMMAND_LINE="$*"
 
 ##
 # Dispolay the local PODS builkd_preffix used
-echo "BUILD_PREFIX = $BUILD_PREFIX"
+#echo "BUILD_PREFIX = $BUILD_PREFIX"
 
 ##
 # Run the command 
